@@ -1,0 +1,368 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Aarambh</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="arambh.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+    integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A chatbot that can help you with your questions related to Rajasthan colleges" />
+  <meta name="keywords"
+    content="Chatbot, Digital Assistant, Rajasthan, Aarambh, Aarambh Chatbot, Aarambh Chatbot, Aarambh, College, Admission" />
+  <meta name="author" content="Aarambh" />
+  <meta name="copyright" content="Aarambh" />
+  <meta name="language" content="English" />
+  <meta name="charSet" content="utf-8" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="msapplication-TileImage" content="assets/boto.png" />
+  <link rel="icon" href="../assets/icons/boto.png" />
+  <script src="https://cdn.jsdelivr.net/npm/disable-devtool"></script>
+  <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
+  <script src="arambh.js" type="module"></script>
+  <script>
+    function newchat() {
+      document.getElementById("quick_ghost").style.display = "flex";
+      document.getElementById("chat-history").innerHTML = "";
+      document.getElementById("typing-dots").style.display = "none";
+      document.getElementById("send").disabled = false;
+      document.getElementById("user-input").disabled = false;
+      document.getElementById("bot").style.filter = "opacity(1)";
+      document.getElementById("user-input").value = "Hello 👋";
+      document.getElementById("user-input").focus();
+      document.getElementById("chat-history").scrollTop =
+        document.getElementById("chat-history").scrollHeight;
+
+      const chatContainer = document.querySelector(".chat-container");
+
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function response_text_formatter(response) {
+      // Create a temporary container for processing
+      const container = document.createElement("div");
+
+      // Replace URLs with clickable links
+      response = response.replace(/(https?:\/\/[^\s]+)/g, (url) => {
+        return `<a style="color:blue;text-decoration:none" href="${url}" target="_blank">${url}</a>`;
+      });
+
+      // Replace newlines with <br> for better formatting
+      response = response.replace(/\n/g, "<br>");
+
+      // When their is a text in ** then it will be bold
+      response = response.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+      // When their is a text in * then it will be italic
+      response = response.replace(/\*(.*?)\*/g, "<i>$1</i>");
+      // When their is a text in _ then it will be underline
+      response = response.replace(/_(.*?)_/g, "<u>$1</u>");
+
+      // Set the formatted HTML to the container
+      container.innerHTML = response;
+
+      // Return the formatted HTML as a string
+      return container.innerHTML;
+    }
+
+  </script>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const startRecordBtn = document.getElementById('audio_input');
+      const result = document.getElementById('user-input');
+      const logs = document.getElementById('audio_out');
+
+      // Check if the browser supports the SpeechRecognition API
+      window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (window.SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false; // Stop automatically after the user stops speaking
+        recognition.interimResults = false; // Only show final results
+        recognition.lang = 'en-US'; // Set language to English (US)
+        startRecordBtn.addEventListener('click', () => {
+          recognition.start();
+          logs.textContent = "Listening..."
+          logs.style.display = "flex";
+        });
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          logs.style.display = "none";
+          result.value = `${transcript}`;
+          document.getElementById("send").click();
+        };
+
+        recognition.onend = () => {
+          logs.textContent = "Sorry, I didn't catch that. Please try again.";
+          setTimeout(() => {
+            logs.style.display = "none";
+          }, 4000);
+        }
+
+        recognition.onspeechend = () => {
+          recognition.stop();
+        };
+
+        recognition.onerror = (event) => {
+          logs.style.display = "flex";
+          logs.textContent = `Error occurred: ${event.error}`;
+          setTimeout(() => {
+            logs.style.display = "none";
+          }, 4000);
+        };
+      } else {
+        logs.style.display = "flex";
+        logs.textContent = 'Sorry, your browser does not support Speech Recognition.';
+        setTimeout(() => {
+          logs.style.display = "none";
+        }, 4000);
+      }
+    });
+  </script>
+  <style>
+    #help {
+      position: fixed;
+      top: 0;
+      right: 0;
+      margin: 10px;
+      padding: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body align="center" id="body">
+  <center>
+    <div class="load-holder" id="load-holder">
+        <div id="loader"></div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+    <header>
+      <button style="background: transparent; padding: 1vw" id="back" onclick="window.history.back()">
+        <i class="fa fa-left-long"></i>
+      </button>
+      <select id="lang_select">
+        <option value="English" selected>English</option>
+        <option value="Hindi">Hindi</option>
+        <option value="Rajasthani">Rajasthani</option>
+      </select>
+      <span> ACE </span>
+      <!-- Help button -->
+      <i class="fa fa-question-circle" id="help" onclick="window.location.href='../help'"></i>
+
+    </header>
+
+    <script>
+      function closeSide() {
+        document.getElementById("side_bar").style.width = "0vw";
+        document.getElementById("side_content").style.display = "none";
+        document.getElementById("side_close_i").className = "fa-solid fa-chevron-right";
+        document.getElementById("side_close").style.left = "0vw";
+        document.getElementById("chat-container").style.right = "18vw";
+        document.getElementById("quick_ghost").style.left = "25.5vw";
+        document.getElementById("user-input").style.right = "19.4vw";
+        document.getElementById("send").style.right = "20vw";
+        document.getElementById("audio_input").style.right = "23.4vw"
+        document.getElementById("audio_out").style.right = "23.5vw";
+        document.getElementById("newchat").style.left = "21vw";
+        document.getElementById("typing-dots").style.left = "48vw";
+        document.getElementById("side_close").onclick = openSide;
+      }
+
+      function openSide() {
+        document.getElementById("side_bar").style.width = "26vw";
+        document.getElementById("side_content").style.display = "block";
+        document.getElementById("side_close_i").className = "fa-solid fa-chevron-left";
+        document.getElementById("side_close").style.left = "26vw";
+        document.getElementById("chat-container").style.right = "5.5vw";
+        document.getElementById("quick_ghost").style.left = "38vw";
+        document.getElementById("user-input").style.right = "6.9vw";
+        document.getElementById("send").style.right = "7.25%";
+        document.getElementById("audio_input").style.right = "10.25%";
+        document.getElementById("audio_out").style.right = "10.25%";
+        document.getElementById("newchat").style.left = "33.25%";
+        document.getElementById("typing-dots").style.left = "60vw";
+        document.getElementById("side_close").onclick = closeSide;
+      }
+    </script>
+
+    <div id="side_close" onclick="closeSide()"><i id="side_close_i" class="fa-solid fa-chevron-left"></i></div>
+    <div class="side_bar" id="side_bar">
+      <div id="side_content">
+        <p id="hist_title">
+          <i class="fa fa-history"></i> History
+          <i id="hist_down" class="fa-solid fa-chevron-down"></i>
+        </p>
+        <div class="hist_cards">
+          <div class="side_card" id="side_1">
+            <p>List of Colleges in Rajasthan</p>
+            <i class="fa fa-chevron-right"></i>
+          </div>
+          <div class="side_card" id="side_1">
+            <p>Placement Information</p>
+            <i class="fa fa-chevron-right"></i>
+          </div>
+          <div class="side_card" id="side_1">
+            <p>Available Scholarships</p>
+            <i class="fa fa-chevron-right"></i>
+          </div>
+          <div class="side_card" id="side_1">
+            <p>Fees and Eligibility</p>
+            <i class="fa fa-chevron-right"></i>
+          </div>
+          <div class="side_card" id="side_1">
+            <p>Webites of Colleges</p>
+            <i class="fa fa-chevron-right"></i>
+          </div>
+          <div class="side_card" id="side_1">
+            <p>Locations of the Colleges</p>
+            <i class="fa fa-chevron-right"></i>
+          </div>
+        </div>
+
+
+
+        <p id="hist_title" style="margin-top:-20px">
+          <i class="fa fa-question"></i> FAQ's
+          <i id="hist_down" class="fa-solid fa-chevron-down"></i>
+        </p>
+        <div class="hist_cards">
+          <div class="side_card" id="side_1">
+            <p>List of Colleges in Rajasthan</p>
+            <i class="fa fa-chevron-right"></i>
+          </div>
+          <div class="side_card" id="side_1">
+            <p>Placement Information</p>
+            <i class="fa fa-chevron-right"></i>
+          </div>
+          <div class="side_card" id="side_1">
+            <p>Available Scholarships</p>
+            <i class="fa fa-chevron-right"></i>
+          </div>
+          <div class="side_card" id="side_1">
+            <p>Fees and Eligibility</p>
+            <i class="fa fa-chevron-right"></i>
+          </div>
+          <div class="side_card" id="side_1">
+            <p>Webites of Colleges</p>
+            <i class="fa fa-chevron-right"></i>
+          </div>
+          <div class="side_card" id="side_1">
+            <p>Locations of the Colleges</p>
+            <i class="fa fa-chevron-right"></i>
+          </div>
+          <div class="side_card" id="side_1">
+            <p>Admission Updates</p>
+            <i class="fa fa-chevron-right"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="chat-container" id="chat-container">
+      <div id="chat-history"></div>
+      <table style="width: 100%" align="center">
+        <tr>
+          <td>
+            <button onclick="newchat()" style="float: left" title="New chat" id="newchat">
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+          </td>
+          <td style="width: 100%">
+            <input type="search" class="border-gradient border-gradient-purple" autocomplete="off" autofocus
+              id="user-input" value="Hello 👋" placeholder="Type your message here..." autofocus />
+          </td>
+          <td>
+            <div id="audio_out">Listening...</div>
+            <button id="audio_input" style="float: right; z-index: 1">
+              <i class="fa-solid fa-microphone"></i>
+            </button>
+          </td>
+          <td>
+            <button id="send" style="float: right; z-index: 1">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </td>
+        </tr>
+      </table>
+      <img src="assets/boto.png" id="bot" height="250px" width="220px" />
+
+      <script>
+        function ask_ghost(id) {
+          document.getElementById("quick_ghost").style.display = "none";
+          var text = "";
+          if (id == 1) {
+            text = "List of Colleges in Rajasthan";
+          }
+          else if (id == 2) {
+            text = "Information about Jaisalmer College";
+          }
+          else if (id == 3) {
+            text = "Information about Ajmer College";
+          }
+          else if (id == 4) {
+            text = "College with highest placement";
+          }
+          document.getElementById("user-input").value = text;
+          document.getElementById("send").click();
+        }
+      </script>
+
+      <div class="quick_ghost" id="quick_ghost">
+        <div class="ghost" onclick="ask_ghost(1)" id="g1">
+          <p>
+            <!-- Idea one -->
+            <div id="idea"><i class="fa-solid fa-lightbulb"></i><br><br></div>
+            List of Colleges in Rajasthan
+          </p>
+        </div>
+
+        <div class="ghost" onclick="ask_ghost(2)" id="g2">
+          <p>
+            <!-- Idea two -->
+            <div id="idea"><i class="fa-solid fa-lightbulb"></i><br><br></div>
+            Information about Jaisalmer College
+          </p>
+        </div>
+
+        <div class="ghost" onclick="ask_ghost(3)" id="g3">
+          <p>
+            <!-- Idea threee -->
+            <div id="idea"><i class="fa-solid fa-lightbulb"></i><br><br></div>
+            Information about Ajmer College
+          </p>
+        </div>
+
+        <div class="ghost" onclick="ask_ghost(4)" id="g4">
+          <p>
+            <!-- Idea four -->
+            <div id="idea"><i class="fa-solid fa-lightbulb"></i><br><br></div>
+            College with highest placement
+          </p>
+        </div>
+      </div>
+
+      <div class="typing-dots" id="typing-dots">
+        <div id="dot1"></div>
+        <div id="dot2"></div>
+        <div id="dot3"></div>
+      </div>
+    </div>
+
+  </center>
+</body>
+
+</html>
