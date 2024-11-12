@@ -8,6 +8,7 @@ import FAQs from './pages/faqs';
 import Feedback from './pages/feedback';
 import Login from './pages/login';
 import Loader from './components/loader';
+// import App2 from './pages/App2';
 
 function Header() {
   return (
@@ -20,6 +21,7 @@ function Header() {
         <Link to="/faqs">FAQ's</Link>
         <Link to="/feedback">Feedback</Link>
         <Link to="/login">Login</Link>
+        {/* <Link to="/ACE"> ACE </Link> */}
       </nav>
     </header>
   );
@@ -40,6 +42,7 @@ function App() {
           <Route path="/faqs" element={<FAQs />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/login" element={<Login />} />
+          {/* <Route path="/ACE" element={<App2 />} /> */}
         </Routes>
       </Router>
     </div >
