@@ -13,6 +13,7 @@ function Home() {
                 </p>
             </h1>
             <br />
+            <a href="/ace"><i className="fa fa-right-long"></i></a>
             {/* <button onClick={<App2></App2>}><i className="fa fa-right-long"></i></button> */}
         </div>
     );
